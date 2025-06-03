@@ -12,9 +12,9 @@ double uniform_distribution(void) {
     return distr(gen);
 }
 
-std::vector<std::vector<double>> ingest_data(uint64_t count = 1, std::string path = "100M.u8bin") { // count is in millions
+std::vector<HNSWVector> ingest_data(uint64_t count = 1, std::string path = "100M.u8bin") { // count is in millions
     std::ifstream binfile(path, std::ios::binary);
-    std::vector<std::vector<double>> vector_buffer;
+    std::vector<HNSWVector> vector_buffer;
     vector_buffer.reserve(1 * 1000000);
 
     if (!binfile.is_open()) {
@@ -39,10 +39,11 @@ std::vector<std::vector<double>> ingest_data(uint64_t count = 1, std::string pat
 
         std::vector<double> new_vec(num_dimensions);
         std::transform(vector.begin(), vector.end(), new_vec.begin(), [](uint8_t x){ return (double)x; });
-        vector_buffer.push_back(new_vec);
+        auto eigen_vec = Eigen::VectorXd::Map(new_vec.data(), new_vec.size());
+        vector_buffer.push_back(HNSWVector(eigen_vec));
     }
 
-    std::cout << "Done ingesting" << std::endl;
+    std::cout << "Done ingesting " << vector_buffer.size() << std::endl;
 
     return vector_buffer;
 }
