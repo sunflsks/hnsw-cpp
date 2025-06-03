@@ -1,8 +1,11 @@
-SRCS = $(wildcard *.cpp)
-OBJS = ${SRCS:.cpp=.o}
-OUT	= hnsw
-CXXFLAGS= -ggdb3 -Wall -Ieigen -std=c++14 -fsanitize=address -O0
-CC	= c++
+SRCDIR   := src/
+OBJDIR   := $(shell mktemp -d)
+
+SRCS     := $(patsubst src/*.cpp, )
+OBJS     := $(patsubst $(SRCDIR)/*.cpp, $(OBJDIR)/%.o,$(SRCS))
+OUT	     := hnsw
+CXXFLAGS := -ggdb3 -Wall -Ieigen -std=c++14 -fsanitize=address -O0
+CC	     := c++
 
 all: $(OUT)
 
