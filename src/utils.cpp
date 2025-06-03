@@ -3,6 +3,7 @@
 #include <fstream>
 #include <iostream>
 #include <Eigen/Dense>
+#include <stdexcept>
 #include <HNSWVector.hpp>
 
 double uniform_distribution(void) {
@@ -12,7 +13,7 @@ double uniform_distribution(void) {
     return distr(gen);
 }
 
-std::vector<HNSWVector> ingest_data(uint64_t count = 1, std::string path = "100M.u8bin") { // count is in millions
+std::vector<HNSWVector> ingest_data(std::string path = "100M.u8bin", uint64_t count = 1) { // count is in millions
     std::ifstream binfile(path, std::ios::binary);
     std::vector<HNSWVector> vector_buffer;
     vector_buffer.reserve(1 * 1000000);
@@ -27,14 +28,12 @@ std::vector<HNSWVector> ingest_data(uint64_t count = 1, std::string path = "100M
     binfile.read(reinterpret_cast<char*>(&num_points), sizeof(uint32_t));
     binfile.read(reinterpret_cast<char*>(&num_dimensions), sizeof(uint32_t));
 
-    std::cout << "THERE ARE " << num_points << " POINTS!!!" << std::endl;
-
-    std::cout << "Ingesting" << std::endl;
+    std::cout << "Ingesting " << num_points << " points." << std::endl;
 
     for (uint64_t i = 0; i < (count * 1000000); i++) {
         std::vector<uint8_t> vector(num_dimensions);
         if (!binfile.read(reinterpret_cast<char*>(vector.data()), vector.size())) {
-            std::cerr << "ERROR@!!!" << std::endl;
+            throw std::runtime_error("Error in reading file");
         }
 
         std::vector<double> new_vec(num_dimensions);
