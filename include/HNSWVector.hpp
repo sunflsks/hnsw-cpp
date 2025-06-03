@@ -1,8 +1,8 @@
+#pragma once
+
 #include <Eigen/Dense>
 #include <unordered_set>
 #include <map>
-
-#pragma once
 
 class HNSWVector {
     private:
