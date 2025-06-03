@@ -1,0 +1,48 @@
+#include <random>
+#include <vector>
+#include <fstream>
+#include <iostream>
+#include <Eigen/Dense>
+#include "vector.hpp"
+
+double uniform_distribution(void) {
+    static auto gen = std::mt19937(42);
+    static auto distr = std::uniform_real_distribution<double>(1e-8, 1);
+
+    return distr(gen);
+}
+
+std::vector<std::vector<double>> ingest_data(uint64_t count = 1, std::string path = "100M.u8bin") { // count is in millions
+    std::ifstream binfile(path, std::ios::binary);
+    std::vector<std::vector<double>> vector_buffer;
+    vector_buffer.reserve(1 * 1000000);
+
+    if (!binfile.is_open()) {
+        return vector_buffer; // just return empty vector.
+    }
+
+    uint32_t num_dimensions;
+    uint32_t num_points;
+
+    binfile.read(reinterpret_cast<char*>(&num_points), sizeof(uint32_t));
+    binfile.read(reinterpret_cast<char*>(&num_dimensions), sizeof(uint32_t));
+
+    std::cout << "THERE ARE " << num_points << " POINTS!!!" << std::endl;
+
+    std::cout << "Ingesting" << std::endl;
+
+    for (uint64_t i = 0; i < (count * 1000000); i++) {
+        std::vector<uint8_t> vector(num_dimensions);
+        if (!binfile.read(reinterpret_cast<char*>(vector.data()), vector.size())) {
+            std::cerr << "ERROR@!!!" << std::endl;
+        }
+
+        std::vector<double> new_vec(num_dimensions);
+        std::transform(vector.begin(), vector.end(), new_vec.begin(), [](uint8_t x){ return (double)x; });
+        vector_buffer.push_back(new_vec);
+    }
+
+    std::cout << "Done ingesting" << std::endl;
+
+    return vector_buffer;
+}
