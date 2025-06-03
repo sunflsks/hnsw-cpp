@@ -1,7 +1,7 @@
 #include <Eigen/Dense>
 #include <iostream>
 #include <cmath>
-#include "utils.hpp"
+#include <utils.hpp>
 
 #define M_MAX 20
 

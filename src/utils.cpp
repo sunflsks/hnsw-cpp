@@ -3,11 +3,11 @@
 #include <fstream>
 #include <iostream>
 #include <Eigen/Dense>
-#include "vector.hpp"
+#include <HNSWVector.hpp>
 
 double uniform_distribution(void) {
     static auto gen = std::mt19937(42);
-    static auto distr = std::uniform_real_distribution<double>(1e-8, 1);
+    static auto distr = std::uniform_real_distribution<double>(1e-8, 1); // avoid divide-by-zero and log(0)
 
     return distr(gen);
 }

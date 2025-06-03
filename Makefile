@@ -1,19 +1,9 @@
-SRCDIR   := src/
-OBJDIR   := $(shell mktemp -d)
+OUT     := hnsw
+CXX     := c++
+CXXFLAGS= -ggdb3 -Wall -Ieigen -Iinclude -std=c++14 -fsanitize=address -O0
 
-SRCS     := $(patsubst src/*.cpp, )
-OBJS     := $(patsubst $(SRCDIR)/*.cpp, $(OBJDIR)/%.o,$(SRCS))
-OUT	     := hnsw
-CXXFLAGS := -ggdb3 -Wall -Ieigen -std=c++14 -fsanitize=address -O0
-CC	     := c++
-
-all: $(OUT)
-
-$(OUT): $(OBJS)
-	$(CC) $(CXXFLAGS) -o $(OUT) $(OBJS) $(LFLAGS)
-
-%.o: %.cpp
-	$(CC) $(CXXFLAGS) -c $< -o $@
+all:
+	$(CXX) src/*.cpp $(CXXFLAGS) -o $(OUT)
 
 clean:
-	rm -f $(OBJS) $(OUT)
+	rm $(OUT)
