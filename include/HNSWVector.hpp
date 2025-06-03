@@ -23,7 +23,7 @@ class HNSWVector {
         HNSWVector(const Eigen::VectorXd& vec); // ctor
         HNSWVector(); // ctor
 
-        std::size_t hash() const; // for hash func
+        std::size_t hash() const; // for hash func -- map, etc
         const Eigen::VectorXd& getVec() const;
         std::vector<HNSWVector> closest_neighbors(int level, int k = 1);
 
