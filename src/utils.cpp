@@ -42,7 +42,7 @@ std::vector<HNSWVector> ingest_data(std::string path = "100M.u8bin", uint64_t co
         vector_buffer.push_back(HNSWVector(eigen_vec));
     }
 
-    std::cout << "Done ingesting " << vector_buffer.size() << std::endl;
+    std::cout << "Done ingesting -- return buffer is of size " << vector_buffer.size() << std::endl;
 
     return vector_buffer;
 }
