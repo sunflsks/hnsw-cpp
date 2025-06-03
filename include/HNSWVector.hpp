@@ -14,7 +14,6 @@ class HNSWVector {
         std::size_t hash() const; // for hash func
         const Eigen::VectorXd& getVec() const;
 
-        void insert(HNSWVector& vec_to_insert); // SHOULD ONLY BE CALLED ON HEAD NODE! otherwise UB.
         double similarity(HNSWVector& vec2, std::string measure);
 };
 
