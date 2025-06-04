@@ -13,10 +13,11 @@ int main(int argc, char** argv) {
     auto vecs = ingest_data(path);
 
     HNSW hnsw;
-
-    for (auto vec : vecs) {
-        hnsw.insert(vec);
-        std::cout << "Inserting vector" << std::endl;
+    std::cout << "Inserting..." << std::endl;
+    hnsw.insert(vecs);
+    std::cout << "Done inserting. Stats:" << std::endl;
+    for (int i = 0; i <= MAXIMUM_LEVEL; i++) {
+        std::cout << "Number of vectors at level " << i << " - " << hnsw.count_per_level(i) << std::endl;
     }
 
     std::cout << vecs.size() << std::endl;

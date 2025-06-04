@@ -102,6 +102,7 @@ void HNSW::insert(HNSWVector* vec_to_insert) { // SHOULD ONLY BE CALLED ON HEAD 
     }
 
     // vector has been properly inserted and is valid in the context of the database.
+    this->_count_per_level[level]++;
     vec_to_insert->is_valid = true;
     this->all_vectors.push_back(vec_to_insert);
 }
