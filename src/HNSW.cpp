@@ -132,9 +132,7 @@ HNSWVector* HNSW::greedy_search(HNSWVector* query, HNSWVector* ep, int level) {
 HNSWVector* HNSW::search(HNSWVector* query) { // nearest neighbor
     auto cur = entry_point;
     for (auto l = max_level; l >= 0; l--) {
-        std::cout << "SEARCHING at level " << l << std::endl;
         auto greedy_result = greedy_search(query, cur, l);
-        std::cout << "DROPPING DOWN: VEC FOUND at level " << l << " - " << greedy_result << std::endl;
         cur = greedy_result;
     }
 
