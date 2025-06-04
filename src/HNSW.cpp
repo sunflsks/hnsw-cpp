@@ -43,14 +43,21 @@ void HNSW::insert(HNSWVector* vec_to_insert) { // SHOULD ONLY BE CALLED ON HEAD 
         // get best M nodes. if on layer 0, get best 2*M nodes. Heuristic 1 (from paper)
         auto mult = (i == 0 ? 2 : 1);
         std::vector<HNSWVector*> new_conns;
-        for (auto j = 0; j < (mult * M_MAX); j++) {
+        while (true) {
             if (maxheap.size() > 0) {
                 new_conns.push_back(maxheap.top());
                 maxheap.pop();
+            } else {
+                break;
             }
         }
+        std::reverse(new_conns.begin(), new_conns.end());
+        new_conns.resize(mult * M_MAX);
 
         for (auto vec : new_conns) {
+            // because of the resizing, we might
+            // have a bunch of nullptrs at the end. skip attempting to insert them.
+            if (vec == nullptr) break;
             vec_to_insert->connect(i, *vec);
         }
     }
