@@ -4,6 +4,7 @@
 #include <iostream>
 #include <Eigen/Dense>
 #include <stdexcept>
+#include <utils.hpp>
 #include <HNSWVector.hpp>
 
 double uniform_distribution(void) {
@@ -45,4 +46,12 @@ std::vector<HNSWVector*> ingest_data(std::string path = "100M.u8bin", uint64_t c
     std::cout << "Done ingesting -- return buffer is of size " << vector_buffer.size() << std::endl;
 
     return vector_buffer;
+}
+MinVectorHeap max_to_min_heap(MaxVectorHeap& maxheap, HNSWVector* query) {
+    MinVectorHeap minheap((ClosestFirstVectorComparator(query)));
+    for (auto element : maxheap.get_set()) {
+        minheap.push(element);
+    }
+
+    return minheap;
 }

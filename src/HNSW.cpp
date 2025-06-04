@@ -161,3 +161,46 @@ std::vector<HNSWVector*> HNSW::heuristic_1(HNSWVector* query, MaxVectorHeap& can
 
     return new_conns;
 }
+
+// by default, we extend candidates and do NOT keep pruned connections
+std::vector<HNSWVector*> HNSW::heuristic_2(HNSWVector* query, MaxVectorHeap candidates, int M, int level, bool extend_candidates, bool keep_pruned_connections) {
+    // get best M nodes. if on layer 0, get best 2*M nodes. Heuristic 1 (from paper)
+    auto R = std::vector<HNSWVector*>();
+    auto W = max_to_min_heap(candidates, query);
+
+    if (extend_candidates) {
+        for (HNSWVector* e : candidates.get_set()) {
+            for (auto e_adj: e->neighbors_for_world[level]) {
+                if (!W.get_set().count(e_adj)) {
+                    W.push(e_adj);
+                }
+            }
+        }
+    }
+
+    auto W_d = MinVectorHeap(ClosestFirstVectorComparator(query));
+
+    while (W.size() > 0 && (R.size() < M)) {
+        auto e = W.pop();
+        bool e_closer_than_r = false;
+        for (auto r : R) {
+            if (query->distance(*e) < query->distance(*r)) {
+                R.push_back(e);
+                e_closer_than_r = true;
+                break;
+            }
+        }
+
+        if (!e_closer_than_r) {
+            W_d.push(e);
+        }
+    }
+
+    if (keep_pruned_connections) {
+        while (W_d.size() > 0 && R.size() < M) {
+            R.push_back(W_d.pop());
+        }
+    }
+
+    return R;
+}

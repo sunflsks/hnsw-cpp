@@ -53,3 +53,5 @@ class Heap {
 
 using MaxVectorHeap = Heap<HNSWVector*, FarthestFirstVectorComparator>;
 using MinVectorHeap = Heap<HNSWVector*, ClosestFirstVectorComparator>;
+
+MinVectorHeap max_to_min_heap(MaxVectorHeap& maxheap, HNSWVector* query);
