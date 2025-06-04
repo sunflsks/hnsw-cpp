@@ -56,3 +56,7 @@ void HNSWVector::connect(int level, HNSWVector& vec2) {
     this->neighbors_for_world[level].insert(&vec2);
     vec2.neighbors_for_world[level].insert(this);
 }
+
+bool HNSWVector::operator==(const HNSWVector& rhs) {
+    return this->vec.isApprox(rhs.vec);
+}
