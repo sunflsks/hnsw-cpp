@@ -39,20 +39,8 @@ void HNSW::insert(HNSWVector* vec_to_insert) { // SHOULD ONLY BE CALLED ON HEAD 
     */
     for (int i = std::min(max_level, level); i >= 0; i--) {
         auto maxheap = a_star_search(vec_to_insert, entry, i);
-
-        // get best M nodes. if on layer 0, get best 2*M nodes. Heuristic 1 (from paper)
-        auto mult = (i == 0 ? 2 : 1);
-        std::vector<HNSWVector*> new_conns;
-        while (true) {
-            if (maxheap.size() > 0) {
-                new_conns.push_back(maxheap.top());
-                maxheap.pop();
-            } else {
-                break;
-            }
-        }
-        std::reverse(new_conns.begin(), new_conns.end());
-        new_conns.resize(mult * M_MAX);
+        auto mult = (i == 0) ? 2 : 1;
+        auto new_conns = heuristic_1(vec_to_insert, maxheap, M_MAX * mult);
 
         for (auto vec : new_conns) {
             // because of the resizing, we might
@@ -152,4 +140,23 @@ HNSWVector* HNSW::search(HNSWVector* query) { // nearest neighbor
     }
 
     return best_vec;
+}
+
+std::vector<HNSWVector*> HNSW::heuristic_1(HNSWVector* query, Heap<HNSWVector*, FarthestFirstVectorComparator>& candidates, int count) {
+    // get best M nodes. if on layer 0, get best 2*M nodes. Heuristic 1 (from paper)
+    std::vector<HNSWVector*> new_conns;
+
+    while (true) {
+        if (candidates.size() > 0) {
+            new_conns.push_back(candidates.top());
+            candidates.pop();
+        } else {
+            break;
+        }
+    }
+
+    std::reverse(new_conns.begin(), new_conns.end());
+    new_conns.resize(count);
+
+    return new_conns;
 }

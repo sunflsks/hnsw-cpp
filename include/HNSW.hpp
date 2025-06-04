@@ -26,4 +26,6 @@ class HNSW {
         HNSWVector* search(HNSWVector* query); // nearest neighbor
         HNSWVector* greedy_search(HNSWVector* query, HNSWVector* entry, int level);
         Heap<HNSWVector*, FarthestFirstVectorComparator> a_star_search(HNSWVector* query, HNSWVector* entry, int level);
+
+        std::vector<HNSWVector*> heuristic_1(HNSWVector* query, Heap<HNSWVector*, FarthestFirstVectorComparator>& candidates, int count);
 };
