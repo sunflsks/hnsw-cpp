@@ -5,12 +5,10 @@
 #include <iostream>
 #include <queue>
 
-#define M_MAX 10
-#define EFCONSTRUCTION 30
 
 void HNSW::insert(HNSWVector* vec_to_insert) { // SHOULD ONLY BE CALLED ON HEAD NODE! otherwise UB.
     static const auto mL = 1 / std::log(M_MAX); // avoid recomputation
-    auto level = std::min(int(-(std::log(uniform_distribution()) * mL)), 5);
+    auto level = std::min(int(-(std::log(uniform_distribution()) * mL)), MAXIMUM_LEVEL);
 
     vec_to_insert->max_level = level;
 
@@ -91,4 +89,10 @@ void HNSW::insert(HNSWVector* vec_to_insert) { // SHOULD ONLY BE CALLED ON HEAD 
 
     vec_to_insert->is_valid = true;
     this->all_vectors.push_back(vec_to_insert);
+}
+
+void HNSW::insert(std::vector<HNSWVector*>& vectors) {
+    for (auto vec : vectors) {
+        insert(vec);
+    }
 }

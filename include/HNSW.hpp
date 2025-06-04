@@ -2,7 +2,9 @@
 
 #include <vector>
 #include <optional>
+#include <consts.hpp>
 #include <HNSWVector.hpp>
+
 
 // main HNSW class -- doesn't really have TOO much besides the insertion logic (which is everything lol)
 class HNSW {

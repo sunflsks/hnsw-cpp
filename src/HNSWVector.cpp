@@ -4,9 +4,6 @@
 #include <algorithm>
 #include <utils.hpp>
 
-
-// index by world (0, 1, etc). gives all neighbors.
-
 HNSWVector::HNSWVector(const Eigen::VectorXd& vec) {
     this->vec = vec;
 }

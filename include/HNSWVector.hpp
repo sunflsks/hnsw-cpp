@@ -1,8 +1,9 @@
 #pragma once
 
+#include <map>
+#include <consts.hpp>
 #include <Eigen/Dense>
 #include <unordered_set>
-#include <map>
 
 class HNSWVector;
 
@@ -15,7 +16,7 @@ class HNSWVector {
         bool is_valid = 0;
         int max_level = 0; // up to what level does this vector go to? entry point will the at the top.
         Eigen::VectorXd vec; // actual vector that is represented by this class
-        MultiLevelNeighborMap neighbors_for_world = std::vector<VectorSet>(25); // TESTING -- delete later.
+        MultiLevelNeighborMap neighbors_for_world = std::vector<VectorSet>(MAXIMUM_LEVEL + 1);
 
         friend class HNSW;
     public:
