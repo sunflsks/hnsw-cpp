@@ -189,7 +189,7 @@ std::vector<HNSWVector*> HNSW::heuristic_1(HNSWVector* query, MaxVectorHeap& can
 
 // by default, we extend candidates and do NOT keep pruned connections
 std::vector<HNSWVector*> HNSW::heuristic_2(HNSWVector* query, MaxVectorHeap candidates, int M, int level, bool extend_candidates, bool keep_pruned_connections) {
-    // get best M nodes. if on layer 0, get best 2*M nodes. Heuristic 1 (from paper)
+    // get best M nodes. if on layer 0, get best 2*M nodes. Heuristic 2 (from paper), algo 4 i believe
     auto R = std::vector<HNSWVector*>();
     auto W = max_to_min_heap(candidates, query);
 
