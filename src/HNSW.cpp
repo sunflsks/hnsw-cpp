@@ -38,8 +38,8 @@ void HNSW::insert(HNSWVector* vec_to_insert) { // SHOULD ONLY BE CALLED ON HEAD 
      * the same between levels
     */
     for (int i = std::min(max_level, level); i >= 0; i--) {
-        Heap<HNSWVector*, VectorComparator> minheap(VectorComparator(*vec_to_insert, 0)); // A* heap
-        Heap<HNSWVector*, VectorComparator> maxheap(VectorComparator(*vec_to_insert, 1)); // heap of best candidates
+        Heap<HNSWVector*, ClosestFirstVectorComparator> minheap((ClosestFirstVectorComparator(vec_to_insert))); // A* heap
+        Heap<HNSWVector*, FarthestFirstVectorComparator> maxheap((FarthestFirstVectorComparator(vec_to_insert))); // heap of best candidates
 
         for (auto vec : entry->neighbors(i)) {
             // neighbors(i) returns all neighbors of entry point

@@ -43,18 +43,20 @@ struct std::hash<HNSWVector> {
 };
 
 // below is mostly for sets among other things.
-struct VectorComparator {
-    const HNSWVector& ref;
-    bool min_heap = 0;
+struct ClosestFirstVectorComparator {
+    HNSWVector* ref;
 
-    VectorComparator(const HNSWVector& ref, bool min_heap = false)
-        : ref(ref), min_heap(min_heap) {}
-
+    ClosestFirstVectorComparator(HNSWVector* ref) : ref(ref) {}
     bool operator()(const HNSWVector* a, const HNSWVector* b) const {
-        if (min_heap) {
-            return ref.similarity(*a) < ref.similarity(*b);
-        }
+        return ref->distance(*a) > ref->distance(*b);
+    }
+};
 
-        return ref.similarity(*a) > ref.similarity(*b);
+struct FarthestFirstVectorComparator {
+    HNSWVector* ref;
+
+    FarthestFirstVectorComparator(HNSWVector* ref) : ref(ref) {}
+    bool operator()(const HNSWVector* a, const HNSWVector* b) const {
+        return ref->distance(*a) < ref->distance(*b);
     }
 };
