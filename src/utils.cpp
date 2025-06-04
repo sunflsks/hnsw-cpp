@@ -31,7 +31,7 @@ std::vector<HNSWVector*> ingest_data(std::string path, uint64_t count) { // coun
 
     std::cout << "Ingesting " << num_points << " points." << std::endl;
 
-    for (uint64_t i = 0; i < (count * 1000); i++) {
+    for (uint64_t i = 0; i < (count * 100000); i++) {
         std::vector<uint8_t> vector(num_dimensions);
         if (!binfile.read(reinterpret_cast<char*>(vector.data()), vector.size())) {
             throw std::runtime_error("Error in reading file");
