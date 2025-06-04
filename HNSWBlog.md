@@ -10,3 +10,16 @@ start: June 3, 00:57:30:
         - just how well my C knowledge is transferring over (and how scary this is because everyone says the biggest mistake you can make w C++ is treating it like C w classes...)
         - ***the actual HNSW algorithm itself***
             - i probably have to reread the paper from top-bottom again... ah well. 
+
+June 4, 01:26:47:
+    - end of the second day. building off of yesterday, i finished understanding the HNSW algorithm earlier today. my first implementation was quite bad (read: nonfunctional), as i was also figuring out C++ reference + pointer semantics lol (shared_ptr who?). anyways, i now have the insert functionality completely working (albeit quite slow -- this will probably not change until i parallelize). all that is left to do is implement the search.
+    
+    - what did i bust my head over today?
+        - the STL library again (specifically how C++ deals with pointers! it's very confusing coming from someone who is v familiar w C but very rusty when it comes to C++). i also had some issues figuring out how std::make_heap and the other STL heap functions work -- i ended up implementing my own Heap class with a std::vector + std::unordered_set backing store. 
+        - actually implementing the insert algorithm
+            - pretty much everything that could have gone wrong went wrong, but then (as things usually do), a few fixes here and there magically got everything working. some of my biggest problems were 
+                - figuring out when/where i need to use maxheap() / minheap() (it turns out that the per-level search is basically just an A* search + a maxheap to track candidates; if only i figured that out earlier...)
+                - getting a bit confused over distance vs similarity metrics (ended up getting some quite terrible performance early on; it turned out i was using the raw similarity as a means to calculate the distance, giving me the WORSE candidates!)
+                - basic code structure; what goes where and how?
+                - lots more!
+    but i figured it out. now, all that is left to do is implement the search and (hopefully) this should be a somewhat accurate implementation. stay tuned!
