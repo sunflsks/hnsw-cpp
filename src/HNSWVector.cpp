@@ -13,7 +13,7 @@ HNSWVector::HNSWVector(const Eigen::VectorXd& vec) {
 
 HNSWVector::HNSWVector() {}
 
-double HNSWVector::similarity(HNSWVector& vec2, std::string measure = "cosine") {
+double HNSWVector::similarity(const HNSWVector& vec2, std::string measure) const {
     if (measure == "cosine") {
         return (vec.dot(vec2.vec)) / (vec.norm() * vec2.vec.norm());
     }
@@ -33,13 +33,21 @@ bool operator==(const HNSWVector& lhs, const HNSWVector& rhs) {
     return lhs.getVec().isApprox(rhs.getVec());
 }
 
-std::vector<HNSWVector> HNSWVector::closest_neighbors(int level, int k) {
-    NeighborMap neighbors = this->neighbors_for_world[level];
-    std::vector<HNSWVector> neighbor_vec;
-    for (const auto& pair: neighbors) neighbor_vec.push_back(pair.first);
+std::vector<HNSWVector*> HNSWVector::neighbors(int world) {
+    std::vector<HNSWVector*> neighbor_vec;
+    for (auto vec: this->neighbors_for_world[world]) neighbor_vec.push_back(vec);
+    neighbor_vec.push_back(this);
 
-    std::sort(neighbor_vec.begin(), neighbor_vec.end(), [this](auto a, auto b) {
-            return this->similarity(a) < this->similarity(b);
+    return neighbor_vec;
+}
+
+std::vector<HNSWVector*> HNSWVector::closest_neighbors(HNSWVector& query, int level, int k) {
+    std::vector<HNSWVector*> neighbor_vec;
+    for (auto vec: this->neighbors_for_world[level]) neighbor_vec.push_back(vec);
+    neighbor_vec.push_back(this);
+
+    std::sort(neighbor_vec.begin(), neighbor_vec.end(), [query](auto a, auto b) {
+            return query.similarity(*a) < query.similarity(*b);
     });
 
     neighbor_vec.resize(k);
@@ -53,4 +61,9 @@ std::size_t HNSWVector::hash() const {
     }
 
     return seed;
+}
+
+void HNSWVector::connect(int level, HNSWVector& vec2) {
+    this->neighbors_for_world[level].insert(&vec2);
+    vec2.neighbors_for_world[level].insert(this);
 }
