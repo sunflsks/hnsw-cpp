@@ -41,7 +41,7 @@ void HNSW::insert(HNSWVector* vec_to_insert) { // SHOULD ONLY BE CALLED ON HEAD 
     for (int i = std::min(max_level, level); i >= 0; i--) {
         auto maxheap = a_star_search(vec_to_insert, entry, i);
         auto mult = (i == 0) ? 2 : 1;
-        auto new_conns = heuristic_1(vec_to_insert, maxheap, M_MAX * mult, i);
+        auto new_conns = heuristic_2(vec_to_insert, maxheap, M_MAX * mult, i);
 
         for (auto vec : new_conns) {
             // because of the resizing, we might
@@ -207,16 +207,17 @@ std::vector<HNSWVector*> HNSW::heuristic_2(HNSWVector* query, MaxVectorHeap cand
 
     while (W.size() > 0 && (R.size() < M)) {
         auto e = W.pop();
-        bool e_closer_than_r = false;
+        bool e_too_close = false;
         for (auto r : R) {
-            if (query->distance(*e) < query->distance(*r)) {
-                R.push_back(e);
-                e_closer_than_r = true;
+            if (e->distance(*r) < query->distance(*r)) {
+                e_too_close = true;
                 break;
             }
         }
 
-        if (!e_closer_than_r) {
+        if (!e_too_close) {
+            R.push_back(e);
+        } else {
             W_d.push(e);
         }
     }
