@@ -112,3 +112,13 @@ void HNSW::insert(std::vector<HNSWVector*>& vectors) {
         insert(vec);
     }
 }
+
+HNSWVector* HNSW::search(HNSWVector* query) { // nearest neighbor
+    auto cur = entry_point;
+    for (auto l = max_level; l >= 0; l--) {
+        auto nearest_neighbor = cur->closest_neighbors(*query, l, 1).front();
+        cur = nearest_neighbor;
+    }
+
+    return cur;
+}
