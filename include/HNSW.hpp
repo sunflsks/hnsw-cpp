@@ -3,6 +3,7 @@
 #include <vector>
 #include <optional>
 #include <consts.hpp>
+#include <utils.hpp>
 #include <HNSWVector.hpp>
 
 
@@ -23,4 +24,6 @@ class HNSW {
         void insert(std::vector<HNSWVector*>& vectors); // wrapper for previous
         int count_per_level(int level) { return this->_count_per_level[level]; }
         HNSWVector* search(HNSWVector* query); // nearest neighbor
+        HNSWVector* greedy_search(HNSWVector* query, HNSWVector* entry, int level);
+        Heap<HNSWVector*, FarthestFirstVectorComparator> a_star_search(HNSWVector* query, HNSWVector* entry, int level);
 };

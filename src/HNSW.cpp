@@ -38,47 +38,7 @@ void HNSW::insert(HNSWVector* vec_to_insert) { // SHOULD ONLY BE CALLED ON HEAD 
      * the same between levels
     */
     for (int i = std::min(max_level, level); i >= 0; i--) {
-        Heap<HNSWVector*, ClosestFirstVectorComparator> minheap((ClosestFirstVectorComparator(vec_to_insert))); // A* heap
-        Heap<HNSWVector*, FarthestFirstVectorComparator> maxheap((FarthestFirstVectorComparator(vec_to_insert))); // heap of best candidates
-
-        for (auto vec : entry->neighbors(i)) {
-            // neighbors(i) returns all neighbors of entry point
-            // this includes the entry point itself
-            minheap.push(vec);
-        }
-
-        // finding best neighbors.
-        while(!minheap.empty()) {
-            auto best = minheap.pop();
-
-            for (HNSWVector* neighbor : best->neighbors(i)) {
-                if (!maxheap.get_set().count(neighbor)) { // if maxheap does not have neighbor.
-                    auto dist = vec_to_insert->distance(*neighbor);
-
-                    // if maxheap is not full, we add like normal
-                    if (maxheap.size() < EFCONSTRUCTION) {
-                        maxheap.push(neighbor);
-                    } else {
-                        // MAXHEAP IS FULL! we get the (possible) worst value from the top
-                        auto possible_worst = maxheap.top();
-
-                        // if the worst value out of all the candidates is WORSE than the possible
-                        // candidate we are checking, we throw it away and add our new (slightly better)
-                        // candidate.
-                        if (dist < vec_to_insert->distance(*possible_worst)) {
-                            maxheap.pop();
-                            maxheap.push(neighbor);
-                        }
-                    }
-                }
-            }
-
-            // if we are done with A* search AND/OR the best possible node we can pop is WORSE than
-            // the worst possible candidate we already have, we exit, as there is no possible gain.
-            if (minheap.empty() || vec_to_insert->distance(*minheap.top()) > vec_to_insert->distance(*maxheap.top())) {
-                break;
-            }
-        }
+        auto maxheap = a_star_search(vec_to_insert, entry, i);
 
         // get best M nodes. if on layer 0, get best 2*M nodes. Heuristic 1 (from paper)
         auto mult = (i == 0 ? 2 : 1);
@@ -107,9 +67,65 @@ void HNSW::insert(HNSWVector* vec_to_insert) { // SHOULD ONLY BE CALLED ON HEAD 
     this->all_vectors.push_back(vec_to_insert);
 }
 
+Heap<HNSWVector*, FarthestFirstVectorComparator> HNSW::a_star_search(HNSWVector* query, HNSWVector* entry, int level) {
+    Heap<HNSWVector*, ClosestFirstVectorComparator> minheap((ClosestFirstVectorComparator(query))); // A* heap
+    Heap<HNSWVector*, FarthestFirstVectorComparator> maxheap((FarthestFirstVectorComparator(query))); // heap of best candidates
+
+    for (auto vec : entry->neighbors(level)) {
+        // neighbors(i) returns all neighbors of entry point
+        // this includes the entry point itself
+        minheap.push(vec);
+    }
+
+    // finding best neighbors.
+    while(!minheap.empty()) {
+        auto best = minheap.pop();
+
+        for (HNSWVector* neighbor : best->neighbors(level)) {
+            if (!maxheap.get_set().count(neighbor)) { // if maxheap does not have neighbor.
+                auto dist = query->distance(*neighbor);
+
+                // if maxheap is not full, we add like normal
+                if (maxheap.size() < EFCONSTRUCTION) {
+                    maxheap.push(neighbor);
+                } else {
+                    // MAXHEAP IS FULL! we get the (possible) worst value from the top
+                    auto possible_worst = maxheap.top();
+
+                    // if the worst value out of all the candidates is WORSE than the possible
+                    // candidate we are checking, we throw it away and add our new (slightly better)
+                    // candidate.
+                    if (dist < query->distance(*possible_worst)) {
+                        maxheap.pop();
+                        maxheap.push(neighbor);
+                    }
+                }
+            }
+        }
+        // if we are done with A* search AND/OR the best possible node we can pop is WORSE than
+        // the worst possible candidate we already have, we exit, as there is no possible gain.
+        if (minheap.empty() || query->distance(*minheap.top()) > query->distance(*maxheap.top())) {
+            return maxheap;
+        }
+    }
+
+    return maxheap;
+}
+
 void HNSW::insert(std::vector<HNSWVector*>& vectors) {
     for (auto vec : vectors) {
         insert(vec);
+    }
+}
+
+HNSWVector* HNSW::greedy_search(HNSWVector* query, HNSWVector* ep, int level) {
+    while(true) {
+        auto closest_neighbor = ep->closest_neighbors(*query, level, 1).front();
+        if (closest_neighbor == ep) {
+            return ep;
+        }
+
+        ep = closest_neighbor;
     }
 }
 
