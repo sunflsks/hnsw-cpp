@@ -1,1 +1,1 @@
-eigen is link to eigen/ library -- download urself
+eigen library is used for vector math
