@@ -12,6 +12,8 @@ void HNSW::insert(HNSWVector* vec_to_insert) { // SHOULD ONLY BE CALLED ON HEAD 
     static const auto mL = 1 / std::log(M_MAX); // avoid recomputation
     auto level = std::min(int(-(std::log(uniform_distribution()) * mL)), 5);
 
+    vec_to_insert->max_level = level;
+
     // ALGORITHM - we recurse down from the top.
 
     // if nothing, then we return.
@@ -19,7 +21,6 @@ void HNSW::insert(HNSWVector* vec_to_insert) { // SHOULD ONLY BE CALLED ON HEAD 
         // no entry point defined; we make it ourselves.
         this->entryPoint = vec_to_insert;
         vec_to_insert->neighbors_for_world = MultiLevelNeighborMap(level + 1);
-        vec_to_insert->max_level = level;
         this->max_level = level;
         this->entryPoint->is_valid = true;
         return;
