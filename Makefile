@@ -1,7 +1,7 @@
 OUT     := hnsw
 CXX     := c++
 SANFLAGS := -fsanitize=address,undefined
-CXXFLAGS= -ggdb3 -Wall -Werror -Ieigen -Iinclude -std=c++14 -O0 $(SANFLAGS)
+CXXFLAGS= -ggdb3 -Wall -Werror -Ieigen -Iinclude -std=c++14 -O3 $(SANFLAGS)
 
 all: clean
 	$(CXX) src/*.cpp $(CXXFLAGS) -o $(OUT)
