@@ -24,20 +24,27 @@ void HNSW::insert(HNSWVector* vec_to_insert) { // SHOULD ONLY BE CALLED ON HEAD 
         return;
     }
 
-    // greedy search - find all the closest nodes at each level UP TO the level the node will be inserted at. push onto list and drop down.
+    // greedy search - find all the closest nodes at each level UP TO the level the node will be
+    // inserted at. push onto list and drop down.
     auto entry = this->entryPoint;
     for (int i = this->max_level; i > level; i--) {
         auto closest_neighbor = entry->closest_neighbors(*vec_to_insert, i, 1).front();
         entry = closest_neighbor;
     }
 
-    // greedy_search_list now has all the vectors we can link to. we now link them all
+    /*
+     * we now conduct A* search on each level SEPARATELY!!!
+     * the neighbors each node has (at a certain level) are usually not
+     * the same between levels
+    */
     for (int i = std::min(max_level, level); i >= 0; i--) {
-        Heap<HNSWVector*, VectorComparator> minheap(VectorComparator(*vec_to_insert, 0));
-        Heap<HNSWVector*, VectorComparator> maxheap(VectorComparator(*vec_to_insert, 1));
+        Heap<HNSWVector*, VectorComparator> minheap(VectorComparator(*vec_to_insert, 0)); // A* heap
+        Heap<HNSWVector*, VectorComparator> maxheap(VectorComparator(*vec_to_insert, 1)); // heap of best candidates
 
         for (auto vec : entry->neighbors(i)) {
-            minheap.push(vec); // neighbors has all neighbors of entry point (including entry point itself)
+            // neighbors(i) returns all neighbors of entry point
+            // this includes the entry point itself
+            minheap.push(vec);
         }
 
         // finding best neighbors.
@@ -45,14 +52,19 @@ void HNSW::insert(HNSWVector* vec_to_insert) { // SHOULD ONLY BE CALLED ON HEAD 
             auto best = minheap.pop();
 
             for (HNSWVector* neighbor : best->neighbors(i)) {
-                if (!maxheap.get_set().count(neighbor)) {
+                if (!maxheap.get_set().count(neighbor)) { // if maxheap does not have neighbor.
                     auto dist = vec_to_insert->similarity(*neighbor);
 
+                    // if maxheap is not full, we add like normal
                     if (maxheap.size() < EFCONSTRUCTION) {
                         maxheap.push(neighbor);
                     } else {
+                        // MAXHEAP IS FULL! we get the (possible) worst value from the top
                         auto possible_worst = maxheap.top();
 
+                        // if the worst value out of all the candidates is WORSE than the possible
+                        // candidate we are checking, we throw it away and add our new (slightly better)
+                        // candidate.
                         if (dist < vec_to_insert->similarity(*possible_worst)) {
                             maxheap.pop();
                             maxheap.push(neighbor);
@@ -61,6 +73,8 @@ void HNSW::insert(HNSWVector* vec_to_insert) { // SHOULD ONLY BE CALLED ON HEAD 
                 }
             }
 
+            // if we are done with A* search AND/OR the best possible node we can pop is WORSE than
+            // the worst possible candidate we already have, we exit, as there is no possible gain.
             if (minheap.empty() || vec_to_insert->similarity(*minheap.top()) > vec_to_insert->similarity(*maxheap.top())) {
                 break;
             }
@@ -87,6 +101,7 @@ void HNSW::insert(HNSWVector* vec_to_insert) { // SHOULD ONLY BE CALLED ON HEAD 
         this->entryPoint = vec_to_insert;
     }
 
+    // vector has been properly inserted and is valid in the context of the database.
     vec_to_insert->is_valid = true;
     this->all_vectors.push_back(vec_to_insert);
 }

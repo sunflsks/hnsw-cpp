@@ -13,10 +13,10 @@ using MultiLevelNeighborMap = std::vector<VectorSet>;
 class HNSWVector {
 
     private:
-        bool is_valid = 0;
-        int max_level = 0; // up to what level does this vector go to? entry point will the at the top.
+        bool is_valid = 0; // set to 0 when just a shallow vector (not in DB), set to 1 when in DB
+        int max_level = 0; // up to what level does this vector go to? entry point will the at the v top.
         Eigen::VectorXd vec; // actual vector that is represented by this class
-        MultiLevelNeighborMap neighbors_for_world = std::vector<VectorSet>(MAXIMUM_LEVEL + 1);
+        MultiLevelNeighborMap neighbors_for_world = std::vector<VectorSet>(MAXIMUM_LEVEL + 1); // neighbors are partitioned per world. each node has a diff. set of neighbors per world
 
         friend class HNSW;
     public:
@@ -25,9 +25,9 @@ class HNSWVector {
         bool operator==(const HNSWVector& rhs);
 
         std::size_t hash() const; // for hash func -- map, etc
-        std::vector<HNSWVector*> closest_neighbors(HNSWVector& query, int level, int k = 1);
-        std::vector<HNSWVector*> neighbors(int world);
-        void connect(int level, HNSWVector& vec2);
+        std::vector<HNSWVector*> closest_neighbors(HNSWVector& query, int level, int k = 1); // closest k neighbors at a certain level for a certain query. similar to the bottom but sorted.
+        std::vector<HNSWVector*> neighbors(int world); // whom are my neighbors?
+        void connect(int level, HNSWVector& vec2); // links two vectors.
 
         double similarity(const HNSWVector& vec2, std::string measure = "cosine") const;
 };
@@ -41,6 +41,7 @@ struct std::hash<HNSWVector> {
     }
 };
 
+// below is mostly for sets among other things.
 struct VectorComparator {
     const HNSWVector& ref;
     bool min_heap = 0;

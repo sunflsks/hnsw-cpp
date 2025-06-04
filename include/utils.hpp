@@ -6,11 +6,10 @@
 double uniform_distribution(void); // generates random floats between 0 -> 1
 std::vector<HNSWVector*> ingest_data(std::string path = "100M.u8bin", uint64_t count = 1);  // count is in millions
 
-template <typename T>
-bool contains(T const& container, typename T::const_reference val) {
-    return std::find(container.begin(), container.end(), val) != container.end();
-}
-
+/*
+ * following is mainly for minheap and maxheap since the STL classes
+ * did not really give me what i needed
+*/
 template <typename T, typename Compare>
 class Heap {
     private:
