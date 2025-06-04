@@ -14,7 +14,7 @@ double uniform_distribution(void) {
     return distr(gen);
 }
 
-std::vector<HNSWVector*> ingest_data(std::string path = "100M.u8bin", uint64_t count = 1) { // count is in millions
+std::vector<HNSWVector*> ingest_data(std::string path, uint64_t count) { // count is in millions
     std::ifstream binfile(path, std::ios::binary);
     std::vector<HNSWVector*> vector_buffer;
     vector_buffer.reserve(1 * 1000000);
