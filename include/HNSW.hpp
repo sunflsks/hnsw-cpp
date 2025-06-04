@@ -15,7 +15,7 @@ class HNSW {
 
         // top-level vector; this will always be the entry point.
         // multiple vectors can share this entryPoint's level, but this will be the start always.
-        HNSWVector* entryPoint = nullptr;
+        HNSWVector* entry_point = nullptr;
 
     public:
         void insert(HNSWVector* vector); // insert one vec

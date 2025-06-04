@@ -15,18 +15,18 @@ void HNSW::insert(HNSWVector* vec_to_insert) { // SHOULD ONLY BE CALLED ON HEAD 
     // ALGORITHM - we recurse down from the top.
 
     // if nothing, then we return.
-    if (!this->entryPoint) {
+    if (!this->entry_point) {
         // no entry point defined; we make it ourselves.
-        this->entryPoint = vec_to_insert;
+        this->entry_point = vec_to_insert;
         vec_to_insert->neighbors_for_world = MultiLevelNeighborMap(level + 1);
         this->max_level = level;
-        this->entryPoint->is_valid = true;
+        this->entry_point->is_valid = true;
         return;
     }
 
     // greedy search - find all the closest nodes at each level UP TO the level the node will be
     // inserted at. push onto list and drop down.
-    auto entry = this->entryPoint;
+    auto entry = this->entry_point;
     for (int i = this->max_level; i > level; i--) {
         auto closest_neighbor = entry->closest_neighbors(*vec_to_insert, i, 1).front();
         entry = closest_neighbor;
@@ -98,7 +98,7 @@ void HNSW::insert(HNSWVector* vec_to_insert) { // SHOULD ONLY BE CALLED ON HEAD 
     // if new level > max level, we promote entry point
     if (level > this->max_level) {
         this->max_level = level;
-        this->entryPoint = vec_to_insert;
+        this->entry_point = vec_to_insert;
     }
 
     // vector has been properly inserted and is valid in the context of the database.
