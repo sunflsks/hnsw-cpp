@@ -22,6 +22,18 @@ double HNSWVector::similarity(const HNSWVector& vec2, std::string measure) const
     return 0.;
 }
 
+double HNSWVector::distance(const HNSWVector& vec2, std::string measure) const {
+    if (measure == "cosine") {
+        return 1 - similarity(vec2, "cosine");
+    }
+
+    else if (measure == "l2") {
+        return (vec - vec2.vec).norm();
+    }
+
+    return 0.;
+}
+
 std::vector<HNSWVector*> HNSWVector::neighbors(int world) {
     std::vector<HNSWVector*> neighbor_vec;
     for (auto vec: this->neighbors_for_world[world]) neighbor_vec.push_back(vec);
@@ -36,7 +48,7 @@ std::vector<HNSWVector*> HNSWVector::closest_neighbors(HNSWVector& query, int le
     neighbor_vec.push_back(this);
 
     std::sort(neighbor_vec.begin(), neighbor_vec.end(), [query](auto a, auto b) {
-            return query.similarity(*a) < query.similarity(*b);
+            return query.distance(*a) < query.distance(*b);
     });
 
     neighbor_vec.resize(k);

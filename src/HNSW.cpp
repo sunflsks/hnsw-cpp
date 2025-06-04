@@ -53,7 +53,7 @@ void HNSW::insert(HNSWVector* vec_to_insert) { // SHOULD ONLY BE CALLED ON HEAD 
 
             for (HNSWVector* neighbor : best->neighbors(i)) {
                 if (!maxheap.get_set().count(neighbor)) { // if maxheap does not have neighbor.
-                    auto dist = vec_to_insert->similarity(*neighbor);
+                    auto dist = vec_to_insert->distance(*neighbor);
 
                     // if maxheap is not full, we add like normal
                     if (maxheap.size() < EFCONSTRUCTION) {
@@ -65,7 +65,7 @@ void HNSW::insert(HNSWVector* vec_to_insert) { // SHOULD ONLY BE CALLED ON HEAD 
                         // if the worst value out of all the candidates is WORSE than the possible
                         // candidate we are checking, we throw it away and add our new (slightly better)
                         // candidate.
-                        if (dist < vec_to_insert->similarity(*possible_worst)) {
+                        if (dist < vec_to_insert->distance(*possible_worst)) {
                             maxheap.pop();
                             maxheap.push(neighbor);
                         }
@@ -75,7 +75,7 @@ void HNSW::insert(HNSWVector* vec_to_insert) { // SHOULD ONLY BE CALLED ON HEAD 
 
             // if we are done with A* search AND/OR the best possible node we can pop is WORSE than
             // the worst possible candidate we already have, we exit, as there is no possible gain.
-            if (minheap.empty() || vec_to_insert->similarity(*minheap.top()) > vec_to_insert->similarity(*maxheap.top())) {
+            if (minheap.empty() || vec_to_insert->distance(*minheap.top()) > vec_to_insert->distance(*maxheap.top())) {
                 break;
             }
         }

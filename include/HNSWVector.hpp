@@ -30,6 +30,7 @@ class HNSWVector {
         void connect(int level, HNSWVector& vec2); // links two vectors.
 
         double similarity(const HNSWVector& vec2, std::string measure = "cosine") const;
+        double distance(const HNSWVector& vec2, std::string measure = "cosine") const;
 };
 
 bool operator==(const HNSWVector& lhs, const HNSWVector& rhs);
