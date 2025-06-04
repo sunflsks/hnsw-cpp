@@ -133,10 +133,18 @@ HNSWVector* HNSW::search(HNSWVector* query) { // nearest neighbor
     auto cur = entry_point;
     for (auto l = max_level; l >= 0; l--) {
         std::cout << "SEARCHING at level " << l << std::endl;
-        auto nearest_neighbor = cur->closest_neighbors(*query, l, 1).front();
-        std::cout << "VEC FOUND at level " << l << " - " << nearest_neighbor << std::endl;
-        cur = nearest_neighbor;
+        auto greedy_result = greedy_search(query, cur, l);
+        std::cout << "DROPPING DOWN: VEC FOUND at level " << l << " - " << greedy_result << std::endl;
+        cur = greedy_result;
     }
 
-    return cur;
+    auto closest_possible_vecs = a_star_search(query, cur, 0).get_set();
+    auto best_vec = *closest_possible_vecs.begin();
+    for (auto vec : closest_possible_vecs) {
+        if (query->distance(*vec) < query->distance(*best_vec)) {
+                best_vec = vec;
+        }
+    }
+
+    return best_vec;
 }

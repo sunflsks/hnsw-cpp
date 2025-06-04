@@ -21,19 +21,14 @@ int main(int argc, char** argv) {
     }
 
     // try search
-    while(true) {
-        std::string input;
-        std::cout << "Give a number from 0-999 of a vector idx to search:" << std::endl;
-        std::cin >> input;
-        int input_int = std::stoi(input);
-        if (input_int < 0 || input_int > 999) {
-            std::cerr << "Invalid input" << std::endl;
-            continue;
+    auto correct = 0;
+    for (auto i = 0; i < 1000; i++) {
+        auto vec = vecs[i];
+        auto guess = hnsw.search(vec);
+        if (vec == guess) {
+            correct++;
         }
-
-        std::cout << "Searching for vector " << vecs[input_int] << std::endl;
-        hnsw.search(vecs[input_int]);
     }
 
-    std::cout << vecs.size() << std::endl;
+    std::cout << "FINAL ACCURACY: " << (static_cast<double>(correct) / 1000.) << std::endl;
 }
