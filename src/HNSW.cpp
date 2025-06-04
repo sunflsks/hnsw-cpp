@@ -116,7 +116,9 @@ void HNSW::insert(std::vector<HNSWVector*>& vectors) {
 HNSWVector* HNSW::search(HNSWVector* query) { // nearest neighbor
     auto cur = entry_point;
     for (auto l = max_level; l >= 0; l--) {
+        std::cout << "SEARCHING at level " << l << std::endl;
         auto nearest_neighbor = cur->closest_neighbors(*query, l, 1).front();
+        std::cout << "VEC FOUND at level " << l << " - " << nearest_neighbor << std::endl;
         cur = nearest_neighbor;
     }
 
