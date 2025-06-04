@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <iostream>
 #include <queue>
+#include <indicators.hpp>
 
 
 void HNSW::insert(HNSWVector* vec_to_insert) { // SHOULD ONLY BE CALLED ON HEAD NODE! otherwise UB.
@@ -108,9 +109,33 @@ MaxVectorHeap HNSW::a_star_search(HNSWVector* query, HNSWVector* entry, int leve
 }
 
 void HNSW::insert(std::vector<HNSWVector*>& vectors) {
-    for (auto vec : vectors) {
+    indicators::show_console_cursor(false);
+
+    indicators::ProgressBar bar {
+        indicators::option::BarWidth{50},
+        indicators::option::Start{"["},
+        indicators::option::Fill{"="},
+        indicators::option::Lead{">"},
+        indicators::option::Remainder{"-"},
+        indicators::option::End{" ]"},
+        indicators::option::ForegroundColor{indicators::Color::yellow},
+        indicators::option::ShowPercentage{true},
+        indicators::option::ShowElapsedTime{true},
+        indicators::option::ShowRemainingTime{true},
+        indicators::option::PrefixText{"Insertion Progress"},
+        indicators::option::FontStyles{std::vector<indicators::FontStyle>{indicators::FontStyle::bold}}
+    };
+
+    for (auto i = 0; i < vectors.size(); i++) {
+        auto vec = vectors[i];
         insert(vec);
+
+        if (i % 100 == 0) { // every 100 vecs update progress
+            bar.set_progress((static_cast<float>(i) / vectors.size()) * 100);
+        }
     }
+
+    indicators::show_console_cursor(true);
 }
 
 HNSWVector* HNSW::greedy_search(HNSWVector* query, HNSWVector* ep, int level) {
