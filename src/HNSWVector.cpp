@@ -22,14 +22,6 @@ double HNSWVector::similarity(const HNSWVector& vec2, std::string measure) const
     return 0.;
 }
 
-const Eigen::VectorXd& HNSWVector::getVec() const {
-    return vec;
-}
-
-bool operator==(const HNSWVector& lhs, const HNSWVector& rhs) {
-    return lhs.getVec().isApprox(rhs.getVec());
-}
-
 std::vector<HNSWVector*> HNSWVector::neighbors(int world) {
     std::vector<HNSWVector*> neighbor_vec;
     for (auto vec: this->neighbors_for_world[world]) neighbor_vec.push_back(vec);

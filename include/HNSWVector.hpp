@@ -22,9 +22,11 @@ class HNSWVector {
     public:
         HNSWVector(const Eigen::VectorXd& vec);// ctor
         HNSWVector(); // ctor
+        bool operator==(const HNSWVector& rhs) {
+            return this->vec.isApprox(rhs.vec);
+        }
 
         std::size_t hash() const; // for hash func -- map, etc
-        const Eigen::VectorXd& getVec() const;
         std::vector<HNSWVector*> closest_neighbors(HNSWVector& query, int level, int k = 1);
         std::vector<HNSWVector*> neighbors(int world);
         void connect(int level, HNSWVector& vec2);
