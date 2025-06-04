@@ -50,3 +50,6 @@ class Heap {
             return set;
         }
 };
+
+using MaxVectorHeap = Heap<HNSWVector*, FarthestFirstVectorComparator>;
+using MinVectorHeap = Heap<HNSWVector*, ClosestFirstVectorComparator>;

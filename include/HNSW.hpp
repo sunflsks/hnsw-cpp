@@ -27,5 +27,6 @@ class HNSW {
         HNSWVector* greedy_search(HNSWVector* query, HNSWVector* entry, int level);
         Heap<HNSWVector*, FarthestFirstVectorComparator> a_star_search(HNSWVector* query, HNSWVector* entry, int level);
 
-        std::vector<HNSWVector*> heuristic_1(HNSWVector* query, Heap<HNSWVector*, FarthestFirstVectorComparator>& candidates, int count);
+        std::vector<HNSWVector*> heuristic_1(HNSWVector* query, MaxVectorHeap& candidates, int count, int level); // alg 3
+        std::vector<HNSWVector*> heuristic_2(HNSWVector* query, MaxVectorHeap candidates, int count, int level, bool extend_candidates = 1, bool keep_pruned_connections = 0); // alg 4. candidates not a ref bc we modify
 };

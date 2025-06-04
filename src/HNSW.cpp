@@ -40,7 +40,7 @@ void HNSW::insert(HNSWVector* vec_to_insert) { // SHOULD ONLY BE CALLED ON HEAD 
     for (int i = std::min(max_level, level); i >= 0; i--) {
         auto maxheap = a_star_search(vec_to_insert, entry, i);
         auto mult = (i == 0) ? 2 : 1;
-        auto new_conns = heuristic_1(vec_to_insert, maxheap, M_MAX * mult);
+        auto new_conns = heuristic_1(vec_to_insert, maxheap, M_MAX * mult, i);
 
         for (auto vec : new_conns) {
             // because of the resizing, we might
@@ -62,9 +62,9 @@ void HNSW::insert(HNSWVector* vec_to_insert) { // SHOULD ONLY BE CALLED ON HEAD 
     this->all_vectors.push_back(vec_to_insert);
 }
 
-Heap<HNSWVector*, FarthestFirstVectorComparator> HNSW::a_star_search(HNSWVector* query, HNSWVector* entry, int level) {
-    Heap<HNSWVector*, ClosestFirstVectorComparator> minheap((ClosestFirstVectorComparator(query))); // A* heap
-    Heap<HNSWVector*, FarthestFirstVectorComparator> maxheap((FarthestFirstVectorComparator(query))); // heap of best candidates
+MaxVectorHeap HNSW::a_star_search(HNSWVector* query, HNSWVector* entry, int level) {
+    MinVectorHeap minheap((ClosestFirstVectorComparator(query))); // A* heap
+    MaxVectorHeap maxheap((FarthestFirstVectorComparator(query))); // heap of best candidates
 
     for (auto vec : entry->neighbors(level)) {
         // neighbors(i) returns all neighbors of entry point
@@ -142,7 +142,8 @@ HNSWVector* HNSW::search(HNSWVector* query) { // nearest neighbor
     return best_vec;
 }
 
-std::vector<HNSWVector*> HNSW::heuristic_1(HNSWVector* query, Heap<HNSWVector*, FarthestFirstVectorComparator>& candidates, int count) {
+// level is not used in heuristic 1 -- we only need it to maintain API compat w/ heuristic 2
+std::vector<HNSWVector*> HNSW::heuristic_1(HNSWVector* query, MaxVectorHeap& candidates, int count, int level) {
     // get best M nodes. if on layer 0, get best 2*M nodes. Heuristic 1 (from paper)
     std::vector<HNSWVector*> new_conns;
 
