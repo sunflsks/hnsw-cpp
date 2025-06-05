@@ -56,3 +56,9 @@ MinVectorHeap max_to_min_heap(MaxVectorHeap& maxheap, HNSWVector* query) {
 
     return minheap;
 }
+
+void free_data(std::vector<HNSWVector*> vectors) {
+    for (auto vec : vectors) {
+        delete vec;
+    }
+}

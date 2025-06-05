@@ -52,7 +52,5 @@ int main(int argc, char** argv) {
 
     std::cout << "FINAL ACCURACY: " << (static_cast<double>(correct) / query_count) << std::endl;
 
-    for (auto i : vecs) {
-        delete i;
-    }
+    free_data(vecs);
 }
