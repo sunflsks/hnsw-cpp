@@ -17,7 +17,7 @@ double uniform_distribution(void) {
 std::vector<HNSWVector*> ingest_data(std::string path, uint64_t count) { // count is in millions
     std::ifstream binfile(path, std::ios::binary);
     std::vector<HNSWVector*> vector_buffer;
-    vector_buffer.reserve(1 * 1000000);
+    vector_buffer.reserve(count * COUNT_MULTIPLIER);
 
     if (!binfile.is_open()) {
         return vector_buffer; // just return empty vector.
@@ -29,9 +29,9 @@ std::vector<HNSWVector*> ingest_data(std::string path, uint64_t count) { // coun
     binfile.read(reinterpret_cast<char*>(&num_points), sizeof(uint32_t));
     binfile.read(reinterpret_cast<char*>(&num_dimensions), sizeof(uint32_t));
 
-    std::cout << "Ingesting " << num_points << " points." << std::endl;
+    std::cout << "Ingesting " << count * COUNT_MULTIPLIER << "/" << num_points << " points." << std::endl;
 
-    for (uint64_t i = 0; i < (count * 100000); i++) {
+    for (uint64_t i = 0; i < (count * COUNT_MULTIPLIER); i++) {
         std::vector<uint8_t> vector(num_dimensions);
         if (!binfile.read(reinterpret_cast<char*>(vector.data()), vector.size())) {
             throw std::runtime_error("Error in reading file");

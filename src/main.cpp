@@ -11,7 +11,8 @@ int main(int argc, char** argv) {
 
     auto path = argv[1];
 
-    auto vecs = ingest_data(path);
+    auto count = 1;
+    auto vecs = ingest_data(path, count);
 
     HNSW hnsw;
     std::cout << "Inserting..." << std::endl;
@@ -21,7 +22,6 @@ int main(int argc, char** argv) {
         std::cout << "Number of vectors at level " << i << " - " << hnsw.count_per_level(i) << std::endl;
     }
 
-    auto correct = 0;
     indicators::ProgressBar search_bar {
         indicators::option::BarWidth{50},
         indicators::option::Start{"["},
@@ -37,15 +37,22 @@ int main(int argc, char** argv) {
         indicators::option::FontStyles{std::vector<indicators::FontStyle>{indicators::FontStyle::bold}}
     };
 
-    for (auto i = 0; i < 1000; i++) {
+    auto correct = 0;
+    auto query_count = (count * COUNT_MULTIPLIER) / 10;
+    for (auto i = 0; i < query_count; i++) {
         auto vec = vecs[i];
         auto guess = hnsw.search(vec);
         if (vec == guess) {
             correct++;
         }
 
-        if (i % 10 == 0) search_bar.set_progress(i / 1000);
+        if (i % 50 == 0) search_bar.set_progress((static_cast<double>(i) / query_count) * 100);
+
     }
 
-    std::cout << "FINAL ACCURACY: " << (static_cast<double>(correct) / 1000.) << std::endl;
+    std::cout << "FINAL ACCURACY: " << (static_cast<double>(correct) / query_count) << std::endl;
+
+    for (auto i : vecs) {
+        delete i;
+    }
 }
